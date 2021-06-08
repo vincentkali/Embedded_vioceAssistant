@@ -1,5 +1,8 @@
 # Embedded_vioceAssistant
 the voice assistant project with raspberry pi 
 
-# main version
+# working version
 - with basic arch
+- other function
+  - login
+  - raspberrypi function
