@@ -1,35 +1,4 @@
-Skip to content
-Search or jump to…
 
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@vincentkali 
-vincentkali
-/
-Embedded_vioceAssistant
-1
-00
-Code
-Issues
-Pull requests
-1
-Actions
-Projects
-Wiki
-Security
-Insights
-Settings
-Embedded_vioceAssistant/fun.py /
-@poyenchen-d
-poyenchen-d Create fun.py
-Latest commit 3b58724 12 minutes ago
- History
- 1 contributor
-86 lines (68 sloc)  1.86 KB
-  
 from gtts import gTTS
 import os
 import RPi.GPIO as GPIO
@@ -115,16 +84,3 @@ except KeyboardInterrupt:
 finally:
    GPIO.output(LED_PIN, GPIO.LOW)
    GPIO.cleanup()
-© 2021 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Docs
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
-Loading complete
