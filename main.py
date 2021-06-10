@@ -1,5 +1,13 @@
 # -*- coding: utf-8 -*-
 from dataBase import DataBase
+from raspberryPi import *
+import os
+
+def lineNotifyMessage(token, msg):
+    
+    os.system("curl -X POST https:/notify-api.line.me/api/notify \
+              -H 'Authorization: Bearer "+ token+"' \
+              -F 'message=" + msg + "' -F 'imageFile=@./image.jpg' ")
         
 ##### login #####
 def login():
@@ -85,10 +93,15 @@ def init_setup():
     pass
 ############ alarm function (if login failure)#############
 def alarm_lineNotify():
-    print("line notify")
+    global db
+    msg = "Alert!! This person attempt to login\n"
+    for userName in db.get_all_userName():
+        token = db.get_lineToken(userName)
+        lineNotifyMessage(token, msg)
+    print("line notify\n")
 
 def alarm_buzzer():
-    print("buzzer")
+    print("buzzer\n")
 
 def alarm_lightTwinkle():
     print("light twinkle")
@@ -104,6 +117,7 @@ user = "guest"
 db = DataBase()
 db.add_user("admin")
 db.add_password("admin", "admin")
+db.put_lineToken("admin", "KeSXfKSpZCtL0scXNdeaapuvn45FmbSBMAZVIEN4h1m")
 try:
     while(True):
         if user == "guest":
