@@ -1,4 +1,6 @@
 ########### DataBase Class #############################
+from math import sqrt
+
 class DataBase:
     def __init__(self):
         self.MAXUSER = 3
@@ -6,14 +8,15 @@ class DataBase:
         self.userDict = dict()
         self.faceLoginThreshold = float("inf") # 允許誤差
         self.soundLoginThreshold = float("inf") # 允許誤差
+        self.debug = True
         
     ##### add/delete user #####
     def add_user(self, userName: str):
         if self.userNum == self.MAXUSER:
-            print("Database is full, it can only contain "+str(self.MAXUSER)+" users")
+            if self.debug: print("Database is full, it can only contain "+str(self.MAXUSER)+" users")
             return False
         elif userName in list(self.userDict.keys()):
-            print(userName+" is already in database")
+            if self.debug: print(userName+" is already in database")
             return False
         else:
             tempDict = {
@@ -26,35 +29,35 @@ class DataBase:
                                     
             self.userDict.update({userName: tempDict})
             self.userNum += 1
-            print("Success add "+userName+" into database")
+            if self.debug: print("Success add "+userName+" into database")
             return True
     
     def delete_user(self, userName: str):
         if self.userNum == 0:
-            print("There is no user in database")
+            if self.debug: print("There is no user in database")
             return False
         elif userName not in list(self.userDict.keys()):
-            print(userName+" is not in database")
+            if self.debug: print(userName+" is not in database")
             return False
         else:
             self.userDict.pop(userName)
             self.userNum -= 1
-            print("Success delete "+userName+" from database")
+            if self.debug: print("Success delete "+userName+" from database")
             return True
     
     ##### Clock function #####
     def put_clockTime(self, userName: str, clockTime: list):
         if userName not in list(self.userDict.keys()):
-            print(userName+" is not in database")
+            if self.debug: print(userName+" is not in database")
             return False
         else:
             self.userDict[userName]["clockTime"] = clockTime
-            print("Success add "+userName+"'s clockTime into database")
+            if self.debug: print("Success add "+userName+"'s clockTime into database")
             return True
     
     def get_clockTime(self, userName: str):
         if userName not in list(self.userDict.keys()):
-            print(userName+" is not in database")
+            if self.debug: print(userName+" is not in database")
             return False
         else:
             return self.userDict[userName]["clockTime"]
@@ -62,16 +65,16 @@ class DataBase:
     ##### line token #####
     def put_lineToken(self, userName: str, token: str):
         if userName not in list(self.userDict.keys()):
-            print(userName+" is not in database")
+            if self.debug: print(userName+" is not in database")
             return False
         else:
             self.userDict[userName]["lineToken"] = token
-            print("Success add "+userName+"'s line token into database")
+            if self.debug: print("Success add "+userName+"'s line token into database")
             return True
     
     def get_lineToken(self, userName: str):
         if userName not in list(self.userDict.keys()):
-            print(userName+" is not in database")
+            if self.debug: print(userName+" is not in database")
             return False
         else:
             return self.userDict[userName]["lineToken"]
@@ -79,38 +82,38 @@ class DataBase:
     ##### password #####
     def add_password(self, userName: str, password:str):
         if userName not in list(self.userDict.keys()):
-            print(userName+" is not in database")
+            if self.debug: print(userName+" is not in database")
             return False
         else:
             self.userDict[userName]["password"] = password
-            print("Success set "+userName+"'s password")
+            if self.debug: print("Success set "+userName+"'s password")
             return True
     
     def login_password(self, userName: str, password: str):
         if userName not in list(self.userDict.keys()):
-            print(userName+" is not in database")
+            if self.debug: print(userName+" is not in database")
             return False
         elif self.userDict[userName]["password"] == None:
-            print(userName+" does not set password yet")
+            if self.debug: print(userName+" does not set password yet")
             return False
         elif self.userDict[userName]["password"] == password:
-            print(userName+" success login with password")
+            if self.debug: print(userName+" success login with password")
             return True
         else:
-            print(userName+" failure login, wrong password")
+            if self.debug: print(userName+" failure login, wrong password")
             return False
      
     ##### face #####
-    def add_faceID(self, userName: str, faceID: str):
+    def add_faceID(self, userName: str, faceID: list):
         if userName not in list(self.userDict.keys()):
-            print(userName+" is not in database")
+            if self.debug: print(userName+" is not in database")
             return False
         else:
             self.userDict[userName]["faceID"] = faceID
-            print("Success set "+userName+"'s faceID")
+            if self.debug: print("Success set "+userName+"'s faceID")
             return True
     
-    def login_faceID(self, faceID: str):
+    def login_faceID(self, faceID: list):
         minError = float("inf")
         mostLikePerson = None
         
@@ -118,29 +121,34 @@ class DataBase:
             if userData["faceID"] == None:
                 continue
             else:
-                error = abs(faceID - userData["faceID"]) # 類似概念, 要再改一下
+                error = 0
+                for test, db in zip(faceID, userData["faceID"]):
+                    error += sqrt(pow(test[0]-db[0],2) + pow(test[1]-db[1],2))
+
+                if self.debug: print(userName+"'s error: "+str(error))
+                
                 if error < minError:
                     minError = error
                     mostLikePerson = userName
         
         if mostLikePerson == None:
-            print("There is no any faceID in database")
+            if self.debug: print("There is no any faceID in database")
             return False
         elif minError > self.faceLoginThreshold:
-            print("Face login fail")
+            if self.debug: print("Face login fail")
             return False
         else:
-            print(mostLikePerson+" success login with faceID")
+            if self.debug: print(mostLikePerson+" success login with faceID")
             return mostLikePerson
             
     ##### sound #####
     def add_soundID(self, userName: str, soundID: list):
         if userName not in list(self.userDict.keys()):
-            print(userName+" is not in database")
+            if self.debug: print(userName+" is not in database")
             return False
         else:
             self.userDict[userName]["soundID"] = soundID
-            print("Success set "+userName+"'s soundID")
+            if self.debug: print("Success set "+userName+"'s soundID")
             return True
     
     def login_soundID(self, soundID: list):
@@ -157,19 +165,25 @@ class DataBase:
                     mostLikePerson = userName
         
         if mostLikePerson == None:
-            print("There is no any soundID in database")
+            if self.debug: print("There is no any soundID in database")
             return False
         elif minError > self.soundLoginThreshold:
-            print("Face login fail")
+            if self.debug: print("Face login fail")
             return False
         else:
-            print(mostLikePerson+" success login with soundID")
+            if self.debug: print(mostLikePerson+" success login with soundID")
             return mostLikePerson
     
     def check_db(self):
-        print(self.userDict)
+        if self.debug: print(self.userDict)
     
     def get_all_userName(self):
-        print(list(self.userDict.keys()))
+        if self.debug: print(list(self.userDict.keys()))
         return list(self.userDict.keys())
+    
+    def colse_debug(self):
+        self.debug = False
+    
+    def open_debug(self):
+        self.debug = True
         
