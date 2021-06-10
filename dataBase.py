@@ -21,9 +21,7 @@ class DataBase:
         else:
             tempDict = {
                 "password": None,
-                "soundID": None,
                 "faceID": None,
-                "clockTime": [0]*3, # [幾點, 幾分, 幾秒]
                 "lineToken": "" # line notify 時要用的token
                                 }  
                                     
@@ -44,23 +42,6 @@ class DataBase:
             self.userNum -= 1
             if self.debug: print("Success delete "+userName+" from database")
             return True
-    
-    ##### Clock function #####
-    def put_clockTime(self, userName: str, clockTime: list):
-        if userName not in list(self.userDict.keys()):
-            if self.debug: print(userName+" is not in database")
-            return False
-        else:
-            self.userDict[userName]["clockTime"] = clockTime
-            if self.debug: print("Success add "+userName+"'s clockTime into database")
-            return True
-    
-    def get_clockTime(self, userName: str):
-        if userName not in list(self.userDict.keys()):
-            if self.debug: print(userName+" is not in database")
-            return False
-        else:
-            return self.userDict[userName]["clockTime"]
 
     ##### line token #####
     def put_lineToken(self, userName: str, token: str):
@@ -139,39 +120,6 @@ class DataBase:
             return False
         else:
             if self.debug: print(mostLikePerson+" success login with faceID")
-            return mostLikePerson
-            
-    ##### sound #####
-    def add_soundID(self, userName: str, soundID: list):
-        if userName not in list(self.userDict.keys()):
-            if self.debug: print(userName+" is not in database")
-            return False
-        else:
-            self.userDict[userName]["soundID"] = soundID
-            if self.debug: print("Success set "+userName+"'s soundID")
-            return True
-    
-    def login_soundID(self, soundID: list):
-        minError = float("inf")
-        mostLikePerson = None
-        
-        for userName, userData in self.userDict.items():
-            if userData["soundID"] == None:
-                continue
-            else:
-                error = abs(soundID - userData["soundID"]) # 類似概念, 要再改一下
-                if error < minError:
-                    minError = error
-                    mostLikePerson = userName
-        
-        if mostLikePerson == None:
-            if self.debug: print("There is no any soundID in database")
-            return False
-        elif minError > self.soundLoginThreshold:
-            if self.debug: print("Face login fail")
-            return False
-        else:
-            if self.debug: print(mostLikePerson+" success login with soundID")
             return mostLikePerson
     
     def check_db(self):
