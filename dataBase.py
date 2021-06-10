@@ -2,8 +2,6 @@
 class DataBase:
     def __init__(self):
         self.MAXUSER = 3
-        self.MAXSONG = 3
-        self.MAXRECORD = 3
         self.userNum = 0
         self.userDict = dict()
         self.faceLoginThreshold = float("inf") # 允許誤差
@@ -23,8 +21,6 @@ class DataBase:
                 "soundID": None,
                 "faceID": None,
                 "clockTime": [0]*3, # [幾點, 幾分, 幾秒]
-                "songList": list(), # 歌曲清單, 資料類型: string, 內容: 歌曲的名稱
-                "recordList": list(), # 影音日記, 資料類型: string, 內容 影音的路徑 
                 "lineToken": "" # line notify 時要用的token
                                 }  
                                     
@@ -62,49 +58,7 @@ class DataBase:
             return False
         else:
             return self.userDict[userName]["clockTime"]
-        
-    ##### song function #####
-    def add_intoSongList(self, userName: str, songPath: str):
-        if userName not in list(self.userDict.keys()):
-            print(userName+" is not in database")
-            return False
-        elif len(self.userDict[userName]["songList"]) == self.MAXSONG:
-            print(userName+"'s song list is full, it can only contain "+str(self.MAXSONG)+" songs")
-            return False
-        else:
-            self.userDict[userName]["songList"].append(songPath)
-            print("Success add "+userName+"'s song into song list")
-            return True
-    
-    def delete_wholeSongList(self, userName: str):
-        if userName not in list(self.userDict.keys()):
-            print(userName+" is not in database")
-            return False
-        else:
-            print("Success delete "+userName+"'s whole song list from database")
-            self.userDict[userName]["songList"] = list()
-    
-    ##### record log function #####
-    def add_intoRecordList(self, userName: str, recordPath: str):
-        if userName not in list(self.userDict.keys()):
-            print(userName+" is not in database")
-            return False
-        elif len(self.userDict[userName]["recordList"]) == self.MAXRECORD:
-            print(userName+"'s record list is full, it can only contain "+str(self.MAXRECORD)+" records")
-            return False
-        else:
-            self.userDict[userName]["recordList"].append(recordPath)
-            print("Success add "+userName+"'s record into record list")
-            return True
-    
-    def delete_wholeRecordList(self, userName: str):
-        if userName not in list(self.userDict.keys()):
-            print(userName+" is not in database")
-            return False
-        else:
-            print("Success delete "+userName+"'s whole record list from database")
-            self.userDict[userName]["recordList"] = list()
-            
+
     ##### line token #####
     def put_lineToken(self, userName: str, token: str):
         if userName not in list(self.userDict.keys()):
@@ -142,6 +96,9 @@ class DataBase:
         elif self.userDict[userName]["password"] == password:
             print(userName+" success login with password")
             return True
+        else:
+            print(userName+" failure login, wrong password")
+            return False
      
     ##### face #####
     def add_faceID(self, userName: str, faceID: str):
@@ -208,3 +165,5 @@ class DataBase:
         else:
             print(mostLikePerson+" success login with soundID")
             return mostLikePerson
+    def check_db(self):
+        print(self.userDict)
