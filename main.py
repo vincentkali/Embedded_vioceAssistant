@@ -2,8 +2,15 @@
 from dataBase import DataBase
 from raspberryPi import *
 import os
+import picamera
+import time
+
 
 def lineNotifyMessage(token, msg):
+    camera = picamera.PiCamera()
+    time.sleep(2) # Camera warm-up time
+    camera.capture('image.jpg')
+
     
     os.system("curl -X POST https:/notify-api.line.me/api/notify \
               -H 'Authorization: Bearer "+ token+"' \
