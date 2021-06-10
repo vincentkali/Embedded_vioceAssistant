@@ -165,5 +165,11 @@ class DataBase:
         else:
             print(mostLikePerson+" success login with soundID")
             return mostLikePerson
+    
     def check_db(self):
         print(self.userDict)
+    
+    def get_all_userName(self):
+        print(list(self.userDict.keys()))
+        return list(self.userDict.keys())
+        
