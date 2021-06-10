@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from dataBase import DataBase
+import fun
 import os
 import picamera
 import time
@@ -13,6 +14,58 @@ import cv2
 
 import picamera
 import time
+from gtts import gTTS
+import os
+import RPi.GPIO as GPIO
+import time
+from threading import Thread
+import speech_recognition as sr
+import librosa
+import matplotlib.pyplot as plt
+import numpy as np
+import librosa.display
+
+
+global mfccs
+global text
+##LED
+LED_PIN = 12
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(LED_PIN, GPIO.OUT)
+ 
+def txt2voice(talk: str):
+    tts = gTTS(text=talk, lang='en')
+    print(tts)
+    tts.save('txt2voice.mp3')
+    os.system('omxplayer -o local -p txt2voice.mp3 > /dev/null 2>&1')
+
+def voice2txt():
+    r=sr.Recognizer()
+    with sr.Microphone() as source:
+        r.adjust_for_ambient_noise(source, duration=1)
+        os.system('omxplayer -o local -p say.mp3 > /dev/null 2>&1')
+        audio =r.listen(source)
+        talk = r.recognize_google(audio,language="en")
+        print(talk)
+        return talk
+
+def LED_on():
+    GPIO.output(LED_PIN, GPIO.HIGH)
+    os.system('omxplayer -o local -p LEDon.mp3 > /dev/null 2>&1')
+
+def LED_off():
+    GPIO.output(LED_PIN, GPIO.LOW)
+    os.system('omxplayer -o local -p LEDoff.mp3 > /dev/null 2>&1')
+
+def music():
+    os.system('omxplayer -o local -p music1.mp3 > /dev/null 2>&1')
+
+def record():
+    os.system('omxplayer -o local -p say.mp3 > /dev/null 2>&1')
+    os.system('arecord  -f cd -d 3 record.mp3')
+
+def play_record():
+    os.system('omxplayer -o local -p record.mp3 > /dev/null 2>&1')
 
 def get_faceID():
     global camera
@@ -63,7 +116,9 @@ def login():
     global user
     global db
     global debug
-    way = input("Hi, which way you want to login? password/face/sound\n")
+    #way = input("Hi, which way you want to login?") # password/face/sound
+    txt2voice("Hi which way you want to login")
+    way = voice2txt()
     flag = False
     if way == "face":
         
@@ -83,8 +138,12 @@ def login():
             flag = True
             user = userName
     elif way == "password":
-        userName = input("Please input your user name\n")
-        password = input("Please input your password\n")
+        #userName = input("Please input your user name")
+        txt2voice("Please input your user name")
+        userName = voice2txt()
+        
+        txt2voice("Please input your password")
+        password = input()
         flag = db.login_password(userName, password)
         
         if flag == True:
@@ -97,20 +156,23 @@ def adduser():
     global user
     global db
     global debug
-    userName = input("Please input your user name\n")
+    #userName = input("Please input your user name")
+    txt2voice("Please input your user name")
+    userName = voice2txt()
     db.add_user(userName)
-    password = input("input password\n")
+    #password = input("input password\n")
+    txt2voice("input password\n")
+    password = input()
     db.add_password(userName, password)
     
-    flag = input("want face ID?\n")
+    #flag = input("do you want to use face ID")
+    txt2voice("do you want to use face ID")
+    flag = voice2txt()
     if flag == "yes":
         faceID = get_faceID()
         db.add_faceID(userName, faceID)
         if debug: print("get your face ID\n")
     
-    flag = input("want sound ID?\n")
-    if flag == "yes":
-        if debug: print("get your sound ID\n")
 def logout():
     global user
     global db
@@ -125,26 +187,34 @@ def using():
     global debug
     
     if opration == "delete user":
-        userName = input("Please input the user name which you want to delete\n")
+        #userName = input("Please input the user name which you want to delete")
+        txt2voice("Please input the user name which you want to delete")
+        userName = voice2txt()
         db.delete_user(userName)
+        
     elif opration == "light up" :
+        LED_on()
         if debug: print("light up\n")
-    elif opration == "set clock time" :
-        clocktTime = input("input the clock time\n")
-        #db.put_clockTime(user, clocktTime)
-        if debug: print("clockTime "+clocktTime+"\n")
-    elif opration == "clock up" :
-        if debug: print("clock up\n")
+        
+    elif opration == "light off" :
+        LED_off()
+        if debug: print("light off\n")
+    
     elif opration == "play song" :
+        music()
         if debug: print("play song\n")
+    
+    elif opration == "record" :
+        record()
+        if debug: print("record")
+    
+    elif opration == "play record" :
+        play_record()
+        if debug: print("play record\n")
+    
     else:
         if debug: print("Unkonw command\n")
 
-##### initial setup #####
-def init_setup():
-    # create song diractory
-    # create record diractory
-    pass
 ############ alarm function (if login failure)#############
 def alarm_lineNotify():
     global db
@@ -157,10 +227,20 @@ def alarm_lineNotify():
 
 def alarm_buzzer():
     global debug
+    os.system('omxplayer -o local -p alarm.mp3 > /dev/null 2>&1')
     if debug: print("buzzer\n")
 
 def alarm_lightTwinkle():
     global debug
+    LED_PIN = 12
+    GPIO.setmode(GPIO.BOARD)
+    GPIO.setup(LED_PIN, GPIO.OUT)
+ 
+    for i in range(1,10): 
+        GPIO.output(LED_PIN, GPIO.HIGH)
+        time.sleep(0.25)
+        GPIO.output(LED_PIN, GPIO.LOW)
+        time.sleep(0.25)
     if debug: print("light twinkle")
 
 def alarm():
