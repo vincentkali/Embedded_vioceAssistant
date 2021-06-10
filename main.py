@@ -5,7 +5,8 @@ from dataBase import DataBase
 def login():
     global user
     global db
-    way = input("Hi, which way you want to login? password/face/sound")
+    way = input("Hi, which way you want to login? password/face/sound\n")
+    flag = False
     if way == "face":
         # take a picture
         faceID = None # get faceID
@@ -13,6 +14,7 @@ def login():
         
         userName = db.login_faceID(faceID)
         if userName != False:
+            flag = True
             user = userName
     elif way == "sound":
         # getsound
@@ -21,22 +23,34 @@ def login():
         
         userName = db.login_faceID(soundID)
         if userName != False:
+            flag = True
             user = userName
     elif way == "password":
-        userName = input("Please input your user name")
-        password = input("Please input your password")
-        flag = login_password(userName, password)
+        userName = input("Please input your user name\n")
+        password = input("Please input your password\n")
+        flag = db.login_password(userName, password)
         
         if flag == True:
             user = userName
+    
+    return flag
         
 ##### add user #####
 def adduser():
     global user
     global db
-    userName = input("Please input your user name")
+    userName = input("Please input your user name\n")
     db.add_user(userName)
-
+    password = input("input password\n")
+    db.add_password(userName, password)
+    
+    flag = input("want face ID?\n")
+    if flag == "yes":
+        print("get your face ID\n")
+    
+    flag = input("want sound ID?\n")
+    if flag == "yes":
+        print("get your sound ID\n")
 def logout():
     global user
     global db
@@ -49,27 +63,20 @@ def using():
     global opration
     
     if opration == "delete user":
-        userName = input("Please input the user name which you want to delete")
+        userName = input("Please input the user name which you want to delete\n")
         db.delete_user(userName)
     elif opration == "light up" :
-        pass # light up
+        print("light up\n")
     elif opration == "set clock time" :
-        clocktTime = None# get time
-        db.put_clockTime(user, clocktTime)
+        clocktTime = input("input the clock time\n")
+        #db.put_clockTime(user, clocktTime)
+        print("clockTime "+clocktTime+"\n")
     elif opration == "clock up" :
-        pass # need add signal
-    elif opration == "add song" :
-        songName = None # get song name
-        songPath = None
-        db.add_intoSongList(user, songPath)
+        print("clock up\n")
     elif opration == "play song" :
-        pass # play song
-    elif opration == "record" :
-        pass
-    elif opration == "play record" :
-        pass
+        print("play song\n")
     else:
-        print("Unkonw command")
+        print("Unkonw command\n")
 
 ##### initial setup #####
 def init_setup():
@@ -78,13 +85,18 @@ def init_setup():
     pass
 ############ alarm function (if login failure)#############
 def alarm_lineNotify():
-    pass
+    print("line notify")
 
 def alarm_buzzer():
-    pass
+    print("buzzer")
 
 def alarm_lightTwinkle():
-    pass
+    print("light twinkle")
+
+def alarm():
+    alarm_lineNotify()
+    alarm_buzzer()
+    alarm_lightTwinkle()
 
 ##### main #####
 opration = "login" # login, using, adduser
@@ -92,24 +104,23 @@ user = "guest"
 db = DataBase()
 db.add_user("admin")
 db.add_password("admin", "admin")
-
-while(True):
-    if user == "guest":
-        opration = input("Hi, do you want to login or add user?")
-        if opration == "login":
-            flag = login()
-            if flag == False:
-                alarm()
-        elif opration == "adduser":
-            adduser()
+try:
+    while(True):
+        if user == "guest":
+            opration = input("Hi, do you want to login or add user?\n")
+            if opration == "login":
+                flag = login()
+                if flag == False:
+                    alarm()
+            elif opration == "adduser":
+                adduser()
+            else:
+                print("Unkown command\n")
         else:
-            print("Unkown command")
-    else:
-        opration = input("Hi "+user+", how can I help you?")
-        if opration == "logout":
-            logout()
-        else:
-            using()
-            
-            
-            
+            opration = input("Hi "+user+", how can I help you?\n")
+            if opration == "logout":
+                logout()
+            else:
+                using()
+except KeyboardInterrupt:
+    pass
