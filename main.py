@@ -262,7 +262,9 @@ camera = picamera.PiCamera()
 try:
     while(True):
         if user == "guest":
-            opration = input("Hi, do you want to login or add user?\n")
+            #opration = input("Hi do you want to login or add user")
+            txt2voice("Hi do you want to login or add user")
+            opration = voice2txt()
             if opration == "login":
                 flag = login()
                 if flag == False:
@@ -272,8 +274,10 @@ try:
             else:
                 if debug: print("Unkown command\n")
         else:
-            opration = input("Hi "+user+", how can I help you?\n")
-            if opration == "logout":
+            #opration = input("Hi "+user+", how can I help you?\n")
+            txt2voice("Hi "+user+" how can I help you")
+            opration = voice2txt()
+            if opration == "logout":  
                 logout()
             else:
                 using()
